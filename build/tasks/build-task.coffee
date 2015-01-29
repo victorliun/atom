@@ -163,7 +163,7 @@ module.exports = (grunt) ->
     if process.platform is 'linux'
       cp path.join('resources', 'linux', 'icons'), path.join(buildDir, 'icons')
 
-    dependencies = ['compile', 'generate-license:save', 'generate-module-cache', 'compile-packages-slug', 'generate-asar']
+    dependencies = ['compile', 'generate-license:save', 'generate-module-cache', 'compile-packages-slug']
     dependencies.push('copy-info-plist') if process.platform is 'darwin'
     dependencies.push('set-exe-icon') if process.platform is 'win32'
     grunt.task.run(dependencies...)
