@@ -44,6 +44,7 @@ module.exports =
 class ViewRegistry
   documentPollingInterval: 200
   documentUpdateRequested: false
+  performDocumentPollAfterUpdate: false
   pollIntervalHandle: null
 
   constructor: ->
@@ -186,14 +187,13 @@ class ViewRegistry
   requestDocumentUpdate: ->
     unless @documentUpdateRequested
       @documentUpdateRequested = true
-      @stopPollingDocument()
       requestAnimationFrame(@performDocumentUpdate)
 
   performDocumentUpdate: =>
     @documentUpdateRequested = false
-    @startPollingDocument()
     writer() while writer = @documentWriters.shift()
     reader() while reader = @documentReaders.shift()
+    @performDocumentPoll() if @performDocumentPollAfterUpdate
 
   startPollingDocument: ->
     @pollIntervalHandle = window.setInterval(@performDocumentPoll, @documentPollingInterval)
@@ -202,4 +202,11 @@ class ViewRegistry
     window.clearInterval(@pollIntervalHandle)
 
   performDocumentPoll: =>
-    poller() for poller in @documentPollers
+    console.log "performDocumentPoll"
+    if @documentUpdateRequested
+      console.log "defer"
+      @performDocumentPollAfterUpdate = true
+    else
+      console.log "do it now"
+      @performDocumentPollAfterUpdate = false
+      poller() for poller in @documentPollers
